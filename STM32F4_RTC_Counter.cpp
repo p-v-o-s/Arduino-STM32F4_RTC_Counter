@@ -1,5 +1,6 @@
 /*
-  STM32_RTC_Counter.cpp - Library for accurate timing
+  STM32_RTC_Counter.cpp - Library for high resolution (microsecond),accurate timing
+   using the RTC
   Created by Craig Wm. Versek, 2023-04-20
  */
 
@@ -79,7 +80,7 @@ void RTC_CounterClass::store(){
     //do atomic time sample
     // NOTE: Do not use rtc.getSubSeconds() it is limited to millisecond precision
     uint32_t ss = LL_RTC_TIME_GetSubSecond(RTC);  //get the raw SSR value
-    uint64_t es = rtc.getEpoch();
+    uint64_t es = (uint64_t) rtc.getEpoch();      //this is a unix epoch timetsamp in whole seconds
     // 3. Restore backed-up-state
     if (interrupts_enabled) {
         __enable_irq();
@@ -88,19 +89,15 @@ void RTC_CounterClass::store(){
     _epochMicros_stored  = _convert_subSeconds_to_micros(ss);
     _epochMicros_stored += 1000000*es;
 }
-  
-float RTC_CounterClass::get_seconds_float32(){
-    uint64_t micros_count = get_micros_uint64();
-    float seconds = micros_count/1e6;
-    return seconds;
+   
+uint64_t RTC_CounterClass::get_count_micros(){
+    return _epochMicros_stored - _epochMicros_offset;
 }
 
-double RTC_CounterClass::get_seconds_float64(){
-    uint64_t micros_count = get_micros_uint64();
-    double seconds = micros_count/1e6;
-    return seconds;
+uint64_t RTC_CounterClass::get_offset_epoch_micros(){
+    return _epochMicros_offset;
 }
- 
-uint64_t RTC_CounterClass::get_micros_uint64(){
-    return _epochMicros_stored - _epochMicros_offset;
+
+uint64_t RTC_CounterClass::get_stored_epoch_micros(){
+    return _epochMicros_stored;
 }

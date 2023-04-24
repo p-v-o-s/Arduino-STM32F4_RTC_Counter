@@ -20,9 +20,9 @@ public:
   //Functionality methods
   void reset();
   void store();
-  float    get_seconds_float32();
-  double   get_seconds_float64();
-  uint64_t get_micros_uint64();
+  uint64_t get_count_micros();
+  uint64_t get_offset_epoch_micros();
+  uint64_t get_stored_epoch_micros();
   uint64_t __epochMicros_offset(){return _epochMicros_offset;};
   uint64_t __epochMicros_stored(){return _epochMicros_stored;};
 private:
